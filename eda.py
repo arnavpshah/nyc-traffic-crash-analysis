@@ -102,6 +102,8 @@ def check_chi_square(table, name):
     print("Minimum expected count:", minimum_expected)
     print("Expected counts below 5:", below_five)
 
+    return chi2, p_value, cramers_v, minimum_expected, below_five
+
 
 def make_graphs(hour_rates, borough_rates, factor_rates):
     """Create and save the three EDA visualizations."""
@@ -162,8 +164,8 @@ def main():
     print("\nBOROUGH COUNTS")
     print(data["BOROUGH"].value_counts())
 
-    print("\nTOP CONTRIBUTING FACTORS")
-    print(data[FACTOR_COLUMN].value_counts().head(10))
+    print("\nCONTRIBUTING FACTOR COUNTS")
+    print(data[FACTOR_COLUMN].value_counts(dropna=False).to_string())
 
     # Prepare injury status and hour of day.
     data["hour"] = data["CRASH TIME"].apply(get_hour)
@@ -173,9 +175,13 @@ def main():
     valid = valid[valid[INJURY_COLUMN] >= 0]
 
     print("\nRows with valid injury counts:", len(valid))
+    print("\nINJURY STATUS COUNTS")
+    print(valid["injury_crash"].value_counts().to_string())
 
     print("\nHOUR SUMMARY")
     print(valid["hour"].describe())
+    print("\nCRASH COUNTS BY HOUR")
+    print(valid["hour"].value_counts().sort_index().to_string())
 
     # Research Question 1: Time of day
     hour_data = valid.dropna(subset=["hour"])
